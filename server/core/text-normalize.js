@@ -6,7 +6,7 @@ function toAscii(s) {
           .normalize("NFKD").replace(/[\u0300-\u036f]/g,"");
 }
 
-function baseNorm(s) {
+export function baseNorm(s) {
   return toAscii(s.toLowerCase())
     .replace(/[^\p{Letter}\p{Number}\s]/gu, " ")
     .replace(/\s+/g, " ").trim();
@@ -22,9 +22,9 @@ function expandQuestionForms(q) {
   return Array.from(variants).filter(Boolean);
 }
 
-const WA_VARIANTS = ["whatsapp","whatsap","watsapp","watsap","wp","wpp","wa","whatssapp","whatapp","whats up"];
+export const WA_VARIANTS = ["whatsapp","whatsap","watsapp","watsap","wp","wpp","wa","whatssapp","whatapp","whats up"];
 
-function expandVariants(str) {
+export function expandVariants(str) {
   const out = new Set();
   const forms = expandQuestionForms(str);
   forms.forEach(f => {
@@ -36,5 +36,3 @@ function expandVariants(str) {
   });
   return Array.from(out);
 }
-
-module.exports = { baseNorm, expandVariants, WA_VARIANTS };

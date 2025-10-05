@@ -1,6 +1,6 @@
-const { baseNorm } = require("./text-normalize");
+import { baseNorm } from './text-normalize.js';
 
-function matchQuery(q, items){
+export function matchQuery(q, items){
   const qn = baseNorm(q);
   
   // 1) exact alt
@@ -23,5 +23,3 @@ function matchQuery(q, items){
   if (best && best.score >= 0.15) return best;
   return null;
 }
-
-module.exports = { matchQuery };
