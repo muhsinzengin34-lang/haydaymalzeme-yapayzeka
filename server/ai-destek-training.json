@@ -1,0 +1,43 @@
+{
+  "successfulResponses": [
+    {
+      "question": "Tarla nasıl ekilir?",
+      "answer": "Strateji: Tarlaya dokun → tohum seç → ekimi başlat.\nAnaliz: Buğday 2 dk, mısır 5 dk, havuç 10 dk. Kısa çevrimli ürünler coin/saat açısından daha verimli.\nRisk–Ödül: Hızlı hasat → sık kontrol gerekir / Uzun hasat → daha az takip ama coin/saat düşer.\nGörev: 10 tarla buğday ek, 2 dakikada hasat et; sonra mısıra geç.",
+      "category": "temel",
+      "confidence": 0.95
+    },
+    {
+      "question": "Makine nasıl kullanılır?",
+      "answer": "Strateji: Makineye dokun → ürün seç → üretimi başlat.\nAnaliz: Her makine farklı süre: Fırın 5 dk, şeker değirmeni 20 dk, süt makinesi 60 dk.\nRisk–Ödül: Kısa üretim → sık kontrol / Uzun üretim → gece için ideal.\nGörev: Gündüz kısa üretim (ekmek 5 dk), gece uzun üretim (peynir 3 saat) planla.",
+      "category": "temel",
+      "confidence": 0.92
+    }
+  ],
+  "userPatterns": [
+    {
+      "pattern": "temel_soru",
+      "examples": ["nasıl", "nedir", "ne demek", "anlamadım"],
+      "frequency": 40,
+      "responseType": "educational"
+    },
+    {
+      "pattern": "strateji_soru",
+      "examples": ["en iyi", "optimum", "verimli", "hızlı"],
+      "frequency": 35,
+      "responseType": "strategic"
+    },
+    {
+      "pattern": "sorun_bildirimi",
+      "examples": ["çalışmıyor", "hata", "bug", "problem"],
+      "frequency": 15,
+      "responseType": "troubleshooting"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-01-05T00:00:00.000Z",
+    "totalResponses": 2,
+    "totalPatterns": 3,
+    "source": "user_feedback"
+  }
+}
