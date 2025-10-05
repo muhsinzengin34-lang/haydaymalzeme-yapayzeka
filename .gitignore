@@ -8,17 +8,14 @@ package-lock.json
 .env.production
 
 # Database
-*.sqlite
 *.db
+*.sqlite
+*.sqlite3
 
 # Logs
 logs/
 *.log
 npm-debug.log*
-
-# Cache
-.cache/
-*.cache
 
 # OS
 .DS_Store
@@ -34,10 +31,6 @@ Thumbs.db
 dist/
 build/
 
-# PM2
-.pm2/
-
-# Temporary
-tmp/
-temp/
-*.tmp
+# Cache
+.cache/
+*.cache

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import { getCached, setCached } from '../cache/redis.js';
+import { matchQuery } from './nlp-match.js';
 
 
 dotenv.config();
@@ -46,50 +47,11 @@ function loadQADatabase() {
 }
 
 function findEnhancedQAResponse(message) {
-    const lowerMessage = normalizeTurkishChars(message.toLowerCase().trim());
-    
-    // Tarla ekimi sorularını GPT'ye yönlendir
-    if (lowerMessage.includes('tarla') && (lowerMessage.includes('ek') || lowerMessage.includes('nasil'))) {
-        return null;
+    const match = matchQuery(message, qaDatabase);
+    if (match && match.score >= 0.15) {
+        console.log(`✅ NLP match: ${match.via} (score: ${match.score.toFixed(2)})`);
+        return match.item.answer;
     }
-    
-    for (const qa of qaDatabase) {
-        if (qa.question && normalizeTurkishChars(qa.question.toLowerCase().trim()) === lowerMessage) {
-            return qa.answer;
-        }
-    }
-    
-    for (const qa of qaDatabase) {
-        if (qa.alternativeQuestions && Array.isArray(qa.alternativeQuestions)) {
-            for (const altQuestion of qa.alternativeQuestions) {
-                if (altQuestion && normalizeTurkishChars(altQuestion.toLowerCase().trim()) === lowerMessage) {
-                    return qa.answer;
-                }
-            }
-        }
-    }
-    
-    for (const qa of qaDatabase) {
-        if (qa.keywords && Array.isArray(qa.keywords)) {
-            const messageWords = lowerMessage.split(' ').filter(w => w.length > 2);
-            const keywordMatches = messageWords.filter(word => 
-                qa.keywords.some(keyword => normalizeTurkishChars(keyword.toLowerCase()) === word)
-            );
-            
-            if (keywordMatches.length >= 2) {
-                return qa.answer;
-            }
-            
-            const hasPriceQuery = messageWords.some(w => 
-                ['fiyat', 'fiyati', 'para', 'tl', 'kac', 'kaç', 'ne', 'kadar'].includes(w)
-            );
-            
-            if (keywordMatches.length >= 1 && hasPriceQuery) {
-                return qa.answer;
-            }
-        }
-    }
-    
     return null;
 }
 

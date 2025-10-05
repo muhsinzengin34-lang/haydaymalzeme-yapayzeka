@@ -351,5 +351,131 @@
     "answer": "⏱️ TESLİMAT SÜRESİ\n\n✅ Ödemeniz onaylandıktan sonra:\n📦 Ortalama: 30–50 dakika içinde teslim edilir.\n\n⚠️ Yoğun Saatlerde:\n🕐 Süre 4 saate kadar çıkabilir.\n\n💡 İpucu: Müsait olduğunuz saat aralığını önceden belirtirseniz, teslimat sürecini hızlandırabiliriz!",
     "category": "teslimat_suresi_sorgu, delivery_time, shipping_time, delivery_duration",
     "updatedAt": "2025-10-04T12:10:55.851Z"
+  },
+  {
+    "id": "kb.tesekkur.v1",
+    "question": "Teşekkür ederim",
+    "alternativeQuestions": ["teşekkürler","çok teşekkürler","sağol","saol","sagol","eyvallah","tsk","tesekkur ederim","teşekkür ederim","teşekkur ederim","teşekkür ederım","tesekkurler","tesekkürler","thanks","thank you","çok sağ ol","cok sagol","helal","var olun"],
+    "keywords": ["teşekkür","tesekkur","sagol","saol","eyvallah","tsk","memnuniyet","minnet","çok teşekkürler","thanks"],
+    "answer": "Rica ederiz! 😊 Yardımcı olabildiysek ne mutlu.",
+    "category": "musteri_iletisimi",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.cok_yardimci_oldunuz.v1",
+    "question": "Çok yardımcı oldunuz",
+    "alternativeQuestions": ["mükemmel destek","harikasınız","sağ olun çok yardımcı oldunuz","cok yardimci oldunuz","süpersiniz","coook yardimci oldunuz","yardım için teşekkürler","desteğiniz için teşekkürler","süper destek","mukemmel destek"],
+    "keywords": ["teşekkür","yardım","destek","memnuniyet","harika","süper","mükemmel"],
+    "answer": "Değerli yorumunuz için teşekkür ederiz! 🙌 İhtiyacınız olursa yine yazın; hızlıca yardımcı oluruz.",
+    "category": "musteri_iletisimi",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.memnun_kaldim.v1",
+    "question": "Memnun kaldım",
+    "alternativeQuestions": ["çok iyi hizmet","her şey yolunda","gayet memnunum","cok memnun kaldim","çok memnun kaldım","hizmetten memnun kaldım","memnunum","süpersiniz","ellerinize sağlık"],
+    "keywords": ["memnun","memnuniyet","iyi hizmet","pozitif yorum","olumlu geri bildirim"],
+    "answer": "Harika! 🌾 Yeni hedefinizi yazın, en uygun yolu birlikte seçelim.",
+    "category": "musteri_iletisimi",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.sikayet.v1",
+    "question": "Şikayet etmek istiyorum",
+    "alternativeQuestions": ["şikayetim var","şikayet kaydı","şikayet nereye","şikayet edeceğim","şikayet et","sikayet","memnun kalmadım","kötü deneyim yaşadım","problem var","sorun yaşadım","şikayet hattı","şikayet bildir","şikayet var"],
+    "keywords": ["şikayet","sikayet","sorun","problem","memnun değilim","şikayet kaydı","kötü deneyim"],
+    "answer": "Şikayetinizi WhatsApp üzerinden detaylı iletebilirsiniz: +905423246261 📞 En kısa sürede dönüş yapılacaktır.",
+    "category": "musteri_iletisimi",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.whatsapp_iletisim.v1",
+    "question": "WhatsApp numarası nedir?",
+    "alternativeQuestions": ["whatsapp numarası","whatsap","watsapp","watsap","wpp","wp","whatsapp var mı","whatsapp'tan yazabilir miyim","numara nedir","telefon numarası","iletişim numarası","wa","wa linki","wa.me","whats up","whatsapp yaz","numaranız","numara","telefon","dm atayım mı","whatssapp","whatapp"],
+    "keywords": ["whatsapp","whatsap","watsapp","wpp","wp","wa","wa.me","telefon","numara","iletisim","hat","iletişim"],
+    "answer": "WhatsApp numaramız: +905423246261 📱 Hızlı destek için direkt yazabilirsiniz.",
+    "category": "iletisim_bilgileri",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.telegram_kanal.v1",
+    "question": "Telegram kanalınız var mı?",
+    "alternativeQuestions": ["telegram","telegram kanal","telegram grubu","telegram link","tg","telegram var mı","telegram adresiniz"],
+    "keywords": ["telegram","tg","kanal","grup","iletişim"],
+    "answer": "Telegram kanalımız: @haydaydestek 📢 Güncel duyurular ve destek için katılabilirsiniz.",
+    "category": "iletisim_bilgileri",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.siparis_takip.v1",
+    "question": "Siparişim nerede?",
+    "alternativeQuestions": ["sipariş durumu","kargom nerede","kargo takip","sipariş takip","sipariş no","sipariş numarası","kargo kodu","kargo ne zaman gelir","siparişim ne zaman gelir","nerde","siparis nerede","kargo durumu","takip kodu"],
+    "keywords": ["sipariş","siparis","kargo","takip","nerede","nerde","durum","no","kod"],
+    "answer": "Sipariş takibi için:\n1️⃣ Shopier hesabınızdan kontrol edin\n2️⃣ WhatsApp'tan sipariş numaranızla sorun: +905423246261\n\nDijital teslimatlar genelde 1-24 saat içinde tamamlanır.",
+    "category": "surec_sorulari",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.hesap_islemleri.v1",
+    "question": "Hesap işlemleri nasıl yapılır?",
+    "alternativeQuestions": ["hesap değişikliği","hesap güncelleme","hesap bilgileri","hesabım","profil güncelleme","bilgilerimi değiştirmek istiyorum"],
+    "keywords": ["hesap","profil","güncelleme","değişiklik","bilgi"],
+    "answer": "Hesap işlemleri için WhatsApp üzerinden iletişime geçin: +905423246261 📞\n\nGerekli bilgiler: Kullanıcı adınız ve işlem türü.",
+    "category": "surec_sorulari",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.teknik_baglanti_sorunu.v1",
+    "question": "Bağlantı sorunu yaşıyorum",
+    "alternativeQuestions": ["bağlanamıyorum","bağlantı hatası","internet sorunu","sunucu hatası","server error","connection error","bağlantı kesildi","giriş yapamıyorum","açılmıyor"],
+    "keywords": ["bağlantı","baglanti","hata","error","sunucu","server","internet","giriş","açılmıyor"],
+    "answer": "🔧 Bağlantı Sorunları Çözüm Adımları:\n\n1️⃣ İnternet bağlantınızı kontrol edin\n2️⃣ Uygulamayı tamamen kapatıp açın\n3️⃣ Cihazınızı yeniden başlatın\n4️⃣ Sorun devam ederse WhatsApp: +905423246261",
+    "category": "teknik_sorunlar",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.teknik_kayip_malzeme.v1",
+    "question": "Malzemem kayboldu",
+    "alternativeQuestions": ["malzeme kayıp","eşyam yok","kayıp malzeme","malzeme gelmedi","eksik malzeme","malzeme bulamıyorum","nerede malzemem"],
+    "keywords": ["kayıp","kayboldu","malzeme","eksik","yok","gelmedi","bulamıyorum"],
+    "answer": "📦 Malzeme Kaybı Kontrol:\n\n1️⃣ Envanter/ambar/silo kontrol\n2️⃣ Oyunu yeniden başlatın\n3️⃣ Ekran görüntüsü alın\n4️⃣ WhatsApp'tan bildirin: +905423246261\n\n⚠️ Sipariş numaranızı hazır bulundurun.",
+    "category": "teknik_sorunlar",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.teknik_hata_kodu.v1",
+    "question": "Hata kodu alıyorum",
+    "alternativeQuestions": ["error code","hata mesajı","hata veriyor","kod hatası","sistem hatası","bug","crash","çöküyor"],
+    "keywords": ["hata","error","kod","code","mesaj","bug","crash","çöküyor"],
+    "answer": "🐛 Hata Bildirimi:\n\n1️⃣ Ekran görüntüsü alın (hata kodu görünsün)\n2️⃣ Ne yaptığınızda oluştuğunu not edin\n3️⃣ WhatsApp'a gönderin: +905423246261\n\n⏱️ Teknik ekip 1-4 saat içinde dönüş yapar.",
+    "category": "teknik_sorunlar",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.davranis_acil.v1",
+    "question": "Çok acil lazım",
+    "alternativeQuestions": ["hemen gerek","çok acil","acil destek","acele","şimdi lazım","hemen lazım","acil olur mu","acil yardım","ivedi","urgent"],
+    "keywords": ["acil","hemen","acele","şimdi","acil destek","urgent","ivedi"],
+    "answer": "🚨 Acil Destek:\n\nWhatsApp: +905423246261\n⏱️ Yanıt süresi: 10-30 dakika\n\n💡 İpucu: Sorununuzu detaylı yazarsanız daha hızlı çözüm üretiriz.",
+    "category": "davranis_kaliplari",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.davranis_kararsizlik.v1",
+    "question": "Emin değilim, ne önerirsiniz?",
+    "alternativeQuestions": ["karar veremedim","hangisi daha iyi","ne almalıyım","tavsiye","öneri","seçenek","kararsızım","ne yapmalıyım","fikir"],
+    "keywords": ["kararsız","emin değil","tavsiye","öneri","hangisi","seçenek","ne almalı"],
+    "answer": "🎯 Size Özel Öneri İçin:\n\n1️⃣ Seviyeniz nedir?\n2️⃣ Hangi alanda gelişmek istiyorsunuz? (Derby/Üretim/Genişleme)\n3️⃣ Bütçeniz nedir?\n\nBu bilgilerle en uygun paketi önerebiliriz!",
+    "category": "davranis_kaliplari",
+    "updatedAt": "2025-10-05T14:55:00Z"
+  },
+  {
+    "id": "kb.davranis_naziklik.v1",
+    "question": "Lütfen yardım eder misiniz?",
+    "alternativeQuestions": ["yardım edebilir misiniz","rica etsem","mümkünse","zahmet olmazsa","lütfen","yardımcı olur musunuz","destek olur musunuz"],
+    "keywords": ["lütfen","rica","yardım","destek","zahmet","mümkünse"],
+    "answer": "Tabii ki yardımcı oluruz! 😊\n\nSorununuzu detaylı yazın veya WhatsApp'tan ulaşın: +905423246261\n\nHer türlü destek için buradayız! 🌾",
+    "category": "davranis_kaliplari",
+    "updatedAt": "2025-10-05T14:55:00Z"
   }
 ]
