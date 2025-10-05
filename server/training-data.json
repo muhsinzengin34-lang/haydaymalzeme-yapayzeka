@@ -1,52 +1,12 @@
 {
   "patterns": {
-    "successful_responses": [
-      {
-        "user_question": "Ambar dolu ne yapayım?",
-        "bot_response": "Strateji: Düşük değerli stokları ilanla sat, yüksek değerli üretimi öne al.\nAnaliz: 20 slot boşalırsa üretim %15 hızlanır. Peynir (3 saat) + reçel (2 saat) = 5 saatlik kesintisiz akış.\nRisk–Ödül: Hızlı satış → alan açılır / Bekleme → tıkanma sürer / Aşırı biriktirme → coin/saat düşer.\nGörev: 2 saat içinde 20 slot boşalt; 4 makineye 2 saatlik sıra yaz.",
-        "category": "depo",
-        "success_rate": 0.95
-      },
-      {
-        "user_question": "Derby hangi görevleri seçeyim?",
-        "bot_response": "Strateji: Kısa süre/yüksek puan görevleri öne al (kamyon, kolay üretim).\nAnaliz: 320 puan/30 dk = 10,7 puan/dk; 400 puan/90 dk = 4,4 puan/dk → ilkini tercih et.\nRisk–Ödül: Hızlı görev → yüksek verim / Uzun görev → iptal riski / Karışık → stabil ama ortalama.\nGörev: 3× ≥300 puan ve ≤45 dk görevi sırayla bitir; kooperatif çakışmasını not et.",
-        "category": "derby",
-        "success_rate": 0.92
-      },
-      {
-        "user_question": "Üretim sırası nasıl olmalı?",
-        "bot_response": "Strateji: Sabah kısa çevrim (şeker), gece uzun çevrim (peynir/reçel) planla.\nAnaliz: Peynir 3 saat + Reçel 2 saat = 5 saatlik blok. 24 saatte 4 blok → 28 slot/syklus.\nRisk–Ödül: Tek hat → yüksek verim ama fiyat riski / Çeşitli hat → stabil ama altın/saat düşer.\nGörev: 24 saatlik makine planı yaz; sabah–akşam iki vardiya ayarla.",
-        "category": "uretim",
-        "success_rate": 0.90
-      }
-    ],
-    "common_intents": [
-      {
-        "intent": "depo_sorunu",
-        "keywords": ["ambar", "dolu", "depo", "silo", "yer yok"],
-        "frequency": 35
-      },
-      {
-        "intent": "derby_strateji",
-        "keywords": ["derby", "görev", "puan", "yarış"],
-        "frequency": 28
-      },
-      {
-        "intent": "uretim_optimizasyon",
-        "keywords": ["üretim", "makine", "sıra", "verim"],
-        "frequency": 25
-      },
-      {
-        "intent": "valley_koordinasyon",
-        "keywords": ["valley", "vadi", "takım", "koordinasyon"],
-        "frequency": 12
-      }
-    ]
+    "successful_responses": [],
+    "common_intents": []
   },
   "metadata": {
     "version": "2.0",
     "lastUpdated": "2025-01-05T00:00:00.000Z",
-    "totalPatterns": 3,
-    "source": "user_interactions"
+    "totalPatterns": 0,
+    "source": "empty_initial"
   }
 }
