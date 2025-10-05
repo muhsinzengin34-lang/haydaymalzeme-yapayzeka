@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Hayday Chatbot</title>
+    <link rel="stylesheet" href="admin.css">
+    <script>
+        // Browser extension hatalarını tamamen engelle
+        window.addEventListener('error', (e) => {
+            if (e.message && (e.message.includes('extension') || e.message.includes('Receiving end') || e.message.includes('establish connection') || e.message.includes('chrome-extension'))) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                return true;
+            }
+        }, true);
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            if (e.reason) {
+                const msg = e.reason.message || e.reason.toString();
+                if (msg.includes('establish connection') || msg.includes('Receiving end') || msg.includes('extension')) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    return true;
+                }
+            }
+        }, true);
+        
+        // Console hatalarını filtrele
+        const originalError = console.error;
+        console.error = function(...args) {
+            const msg = args.join(' ');
+            if (msg.includes('establish connection') || msg.includes('Receiving end') || msg.includes('extension')) return;
+            originalError.apply(console, args);
+        };
+        
+        // Chrome runtime hatalarını engelle
+        if (window.chrome && chrome.runtime) {
+            const originalSendMessage = chrome.runtime.sendMessage;
+            chrome.runtime.sendMessage = function(...args) {
+                try {
+                    return originalSendMessage.apply(this, args);
+                } catch (e) {
+                    return Promise.resolve();
+                }
+            };
+        }
+    </script>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="login-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;">
+        <div style="background:white;padding:40px;border-radius:12px;max-width:400px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+            <h2 style="text-align:center;color:#667eea;margin-bottom:30px;">🔐 Admin Girişi</h2>
+            
+            <div id="send-code-step">
+                <p style="text-align:center;color:#666;margin-bottom:20px;">Telegram'a giriş kodu gönderilecek</p>
+                <button class="btn" onclick="sendLoginCode()" style="width:100%;padding:15px;font-size:16px;">📨 Kod Gönder</button>
+            </div>
+            
+            <div id="verify-code-step" style="display:none;">
+                <p style="text-align:center;color:#666;margin-bottom:20px;">Telegram'dan gelen kodu girin</p>
+                <input type="text" id="login-code" placeholder="6 haneli kod" maxlength="6" style="width:100%;padding:15px;font-size:18px;text-align:center;letter-spacing:5px;border:2px solid #e0e0e0;border-radius:8px;margin-bottom:15px;">
+                <button class="btn" onclick="verifyLoginCode()" style="width:100%;padding:15px;font-size:16px;">✅ Doğrula</button>
+                <button class="btn" onclick="backToSendCode()" style="width:100%;padding:10px;font-size:14px;background:#999;margin-top:10px;">← Geri</button>
+            </div>
+            
+            <div id="login-error" style="display:none;background:#ffebee;color:#c62828;padding:10px;border-radius:4px;margin-top:15px;text-align:center;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🌾 Hayday Admin Panel</h1>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="qa" onclick="showTab('qa')">📚 Q&A</button>
+            <button class="tab" data-tab="messages" onclick="showTab('messages')">💬 Mesajlar</button>
+            <button class="tab" data-tab="stats" onclick="showTab('stats')">📊 İstatistik</button>
+            <button class="tab" data-tab="cost" onclick="showTab('cost')">💰 Maliyet</button>
+            <button class="tab" data-tab="performance" onclick="showTab('performance')">🎯 Performans</button>
+            <button class="tab" data-tab="backup" onclick="showTab('backup')">🔄 Yedek</button>
+            <button class="tab" data-tab="ai-learning" onclick="showTab('ai-learning')">🧠 AI Öğrenme</button>
+            <button class="tab" data-tab="test" onclick="showTab('test')">🧪 Test</button>
+            <button class="tab" data-tab="settings" onclick="showTab('settings')">⚙️ Ayarlar</button>
+        </div>
+
+        <div id="qa-tab" class="content">
+            <h2>Bilgi Bankası</h2>
+            
+            <div class="form-group">
+                <label>ID (otomatik oluşturulur):</label>
+                <input type="text" id="qa-id" placeholder="kb.custom.v1" readonly style="background:#f5f5f5;">
+            </div>
+            
+            <div class="form-group">
+                <label>Ana Soru:</label>
+                <input type="text" id="main-question" placeholder="Ürün fiyat listesi ve ücretler">
+            </div>
+            
+            <div class="form-group">
+                <label>Alternatif Sorular (virgülle ayırın):</label>
+                <textarea id="questions" rows="3" placeholder="fiyat listesi nedir, ürün fiyatları neler, kaç para, ne kadar"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Anahtar Kelimeler (virgülle ayırın):</label>
+                <textarea id="keywords" rows="2" placeholder="fiyat, fiyatı, ücret, kaç tl, ne kadar"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Cevap:</label>
+                <textarea id="answer" rows="6" placeholder="Cevabınızı yazın..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Kategori:</label>
+                <input type="text" id="category" placeholder="pricing, greeting, delivery, vb.">
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn" onclick="addQA()">➕ Ekle</button>
+                <button class="btn" onclick="clearForm()" style="background:#999;">🗑️ Temizle</button>
+            </div>
+            
+            <div class="qa-list">
+                <h3 style="margin-top: 30px; color: #667eea;">Mevcut Q&A Listesi</h3>
+                
+                <div style="margin:15px 0;display:flex;gap:10px;flex-wrap:wrap;">
+                    <input type="text" id="qa-search" placeholder="🔍 Ara..." style="flex:1;min-width:200px;padding:10px;border:2px solid #e0e0e0;border-radius:8px;">
+                    <button class="btn" onclick="exportQA()" style="width:auto;">📥 Dışa Aktar</button>
+                    <button class="btn" onclick="document.getElementById('import-file').click()" style="width:auto;background:#764ba2;">📤 İçe Aktar</button>
+                    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importQA(event)">
+                </div>
+                
+                <div id="qa-list"></div>
+            </div>
+        </div>
+
+        <div id="messages-tab" class="content hidden">
+            <h2>💬 Kullanıcı Mesajları</h2>
+            
+            <div class="stats-wrapper">
+                <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Aktif Sohbetler</h3>
+                    <div class="stat-value" id="active-chats">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Bekleyen Mesajlar</h3>
+                    <div class="stat-value" id="pending-messages">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Bugün Toplam</h3>
+                    <div class="stat-value" id="today-total">0</div>
+                </div>
+                </div>
+            </div>
+            
+            <div style="display:flex;gap:10px;margin:15px 0;flex-wrap:wrap;">
+                <input type="text" id="message-search" placeholder="🔍 Kullanıcı veya mesaj ara..." style="flex:1;min-width:200px;padding:10px;border:2px solid #e0e0e0;border-radius:8px;">
+                <select id="message-filter" style="padding:10px;border:2px solid #e0e0e0;border-radius:8px;">
+                    <option value="all">Tüm Mesajlar</option>
+                    <option value="today">Bugün</option>
+                    <option value="week">Bu Hafta</option>
+                    <option value="month">Bu Ay</option>
+                    <option value="unread">Okunmamış</option>
+                </select>
+                <select id="message-status" style="padding:10px;border:2px solid #e0e0e0;border-radius:8px;">
+                    <option value="all">Tüm Durumlar</option>
+                    <option value="active">🟢 Aktif</option>
+                    <option value="waiting">🟡 Bekliyor</option>
+                    <option value="closed">⚫ Kapalı</option>
+                </select>
+                <button class="btn" onclick="refreshMessages()" style="width:auto;">🔄 Yenile</button>
+
+                <button class="btn" onclick="bulkDeleteMessages()" style="width:auto;background:#F44336;">🗑️ Toplu Mesaj Sil</button>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:1fr 2fr;gap:15px;margin-top:20px;">
+                <div style="background:#f5f7fa;padding:15px;border-radius:8px;max-height:600px;overflow-y:auto;">
+                    <h3 style="color:#667eea;margin-bottom:15px;">Sohbet Listesi</h3>
+                    <div id="chat-list">
+                        <div style="text-align:center;padding:20px;color:#999;">💬 Henüz sohbet yok</div>
+                    </div>
+                </div>
+                
+                <div style="background:#f5f7fa;padding:15px;border-radius:8px;display:flex;flex-direction:column;max-height:600px;">
+                    <div id="chat-header" style="padding:10px;background:white;border-radius:8px;margin-bottom:10px;display:none;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div>
+                                <h3 style="margin:0;color:#667eea;" id="chat-user-name">Kullanıcı</h3>
+                                <small style="color:#999;" id="chat-user-info">Çevrimiçi</small>
+                            </div>
+                            <div style="display:flex;gap:5px;">
+                                <button class="btn" onclick="takeOverChat()" style="padding:8px 15px;font-size:13px;">👤 Devral</button>
+                                <button class="btn" onclick="deleteChatMessages()" style="padding:8px 15px;font-size:13px;background:#f44336;">🗑️ Sil</button>
+                                <button class="btn" onclick="closeChat()" style="padding:8px 15px;font-size:13px;background:#999;">❌ Kapat</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="chat-messages" style="flex:1;background:white;border-radius:8px;padding:15px;overflow-y:auto;margin-bottom:10px;">
+                        <div style="text-align:center;padding:40px;color:#999;">
+                            👈 Bir sohbet seçin
+                        </div>
+                    </div>
+                    
+                    <div id="chat-input-area" style="display:none;">
+                        <div style="display:flex;gap:10px;">
+                            <input type="text" id="admin-message-input" placeholder="Mesajınızı yazın..." style="flex:1;padding:12px;border:2px solid #e0e0e0;border-radius:8px;" onkeypress="if(event.key==='Enter') sendAdminMessage()">
+                            <button class="btn" onclick="sendAdminMessage()" style="width:auto;padding:12px 20px;">📤 Gönder</button>
+                        </div>
+                        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+                            <button class="btn" onclick="insertQuickReply('Merhaba! Size nasıl yardımcı olabilirim?')" style="width:auto;padding:6px 12px;font-size:12px;background:#764ba2;">💬 Hızlı: Merhaba</button>
+                            <button class="btn" onclick="insertQuickReply('Fiyat listesini göndereceğim.')" style="width:auto;padding:6px 12px;font-size:12px;background:#764ba2;">💰 Hızlı: Fiyat</button>
+                            <button class="btn" onclick="insertQuickReply('Siparişiniz alındı, teşekkürler!')" style="width:auto;padding:6px 12px;font-size:12px;background:#764ba2;">✅ Hızlı: Sipariş</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cost-tab" class="content hidden">
+            <h2>💰 Maliyet Takibi & Optimizasyon</h2>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                    <h3 style="color:#667eea;margin:0;">📊 Genel Bakış</h3>
+                    <button class="btn" onclick="refreshCostStats()" style="width:auto;padding:8px 15px;">🔄 Yenile</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;">
+                        <h3>Toplam Maliyet</h3>
+                        <div class="stat-value" id="total-cost" style="color:white;">$0.00</div>
+                        <small style="opacity:0.9;">Başlangıçtan beri</small>
+                    </div>
+                    <div class="stat-card" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:white;">
+                        <h3>Bugün</h3>
+                        <div class="stat-value" id="today-cost" style="color:white;">$0.00</div>
+                        <small style="opacity:0.9;">Günlük maliyet</small>
+                    </div>
+                    <div class="stat-card" style="background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;">
+                        <h3>Bu Ay</h3>
+                        <div class="stat-value" id="monthly-cost" style="color:white;">$0.00</div>
+                        <small style="opacity:0.9;">Aylık maliyet</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">📈 Yanıt Dağılımı (Bugün)</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">
+                    <div style="background:white;padding:15px;border-radius:8px;border-left:4px solid #4CAF50;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Q&A Yanıtlar (ÜCRETSİZ)</div>
+                        <div style="font-size:24px;font-weight:bold;color:#4CAF50;" id="today-qa-count">0</div>
+                        <div style="font-size:12px;color:#999;margin-top:5px;" id="today-qa-percent">0%</div>
+                    </div>
+                    <div style="background:white;padding:15px;border-radius:8px;border-left:4px solid #2196F3;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Cache Hits (ÜCRETSİZ)</div>
+                        <div style="font-size:24px;font-weight:bold;color:#2196F3;" id="today-cache-count">0</div>
+                        <div style="font-size:12px;color:#999;margin-top:5px;" id="today-cache-percent">0%</div>
+                    </div>
+                    <div style="background:white;padding:15px;border-radius:8px;border-left:4px solid #f44336;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">GPT Çağrıları (ÜCRETLİ)</div>
+                        <div style="font-size:24px;font-weight:bold;color:#f44336;" id="today-gpt-count">0</div>
+                        <div style="font-size:12px;color:#999;margin-top:5px;" id="today-gpt-percent">0%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">📊 Token Kullanımı (Bu Ay)</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;">
+                    <div style="background:white;padding:15px;border-radius:8px;text-align:center;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Input Tokens</div>
+                        <div style="font-size:20px;font-weight:bold;color:#667eea;" id="monthly-input-tokens">0</div>
+                    </div>
+                    <div style="background:white;padding:15px;border-radius:8px;text-align:center;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Output Tokens</div>
+                        <div style="font-size:20px;font-weight:bold;color:#764ba2;" id="monthly-output-tokens">0</div>
+                    </div>
+                    <div style="background:white;padding:15px;border-radius:8px;text-align:center;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Toplam Tokens</div>
+                        <div style="font-size:20px;font-weight:bold;color:#4CAF50;" id="monthly-total-tokens">0</div>
+                    </div>
+                    <div style="background:white;padding:15px;border-radius:8px;text-align:center;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Ortalama/Çağrı</div>
+                        <div style="font-size:20px;font-weight:bold;color:#FF9800;" id="monthly-avg-tokens">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">📅 Son 30 Gün Maliyet Grafiği</h3>
+                <div id="cost-chart" style="background:white;border-radius:8px;padding:20px;min-height:200px;">
+                    <div style="text-align:center;color:#999;padding:40px;">Yüklüyor...</div>
+                </div>
+            </div>
+            
+            <div style="background:#fff3cd;padding:15px;border-radius:8px;margin-bottom:20px;border-left:4px solid #ffc107;">
+                <h3 style="color:#856404;margin-bottom:10px;">💡 Optimizasyon Önerileri</h3>
+                <div id="optimization-tips" style="color:#856404;">
+                    <p style="margin:5px 0;">• Q&A yanıtlama oranını artırmak için sık sorulan soruları Q&A'ya ekleyin</p>
+                    <p style="margin:5px 0;">• Cache hit oranını artırmak için benzer soruları standartlaştırın</p>
+                    <p style="margin:5px 0;">• GPT kullanımını azaltmak için AI öğrenme sekmesinden "Analiz Et" butonuna basın</p>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;">
+                <h3 style="color:#f44336;margin-bottom:15px;">⚠️ Tehlikeli Bölge</h3>
+                <button class="btn" onclick="resetCostData()" style="background:#f44336;width:auto;">🗑️ Maliyet Verilerini Sıfırla</button>
+                <p style="color:#999;margin-top:10px;font-size:12px;">Dikkat: Tüm maliyet geçmişi silinecek!</p>
+            </div>
+        </div>
+        
+        <div id="stats-tab" class="content hidden">
+            <h2>İstatistikler</h2>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">🤖 AI Durum</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>OpenAI API</h3>
+                        <div class="stat-value" id="openai-status" style="font-size:24px;">⏳</div>
+                        <small id="openai-status-text">Kontrol ediliyor...</small>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Q&A Database</h3>
+                        <div class="stat-value" id="qa-status" style="font-size:24px;">⏳</div>
+                        <small id="qa-status-text">Kontrol ediliyor...</small>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Telegram Bot</h3>
+                        <div class="stat-value" id="telegram-status" style="font-size:24px;">⏳</div>
+                        <small id="telegram-status-text">Kontrol ediliyor...</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-wrapper">
+                <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Toplam Mesaj</h3>
+                    <div class="stat-value" id="total-messages">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Aktif Kullanıcı</h3>
+                    <div class="stat-value" id="active-users">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Bugünkü Mesajlar</h3>
+                    <div class="stat-value" id="today-messages">0</div>
+                </div>
+                </div>
+            </div>
+            
+            <div style="margin-top:30px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">Toplam Q&A Sayısı</h3>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-qa">0</div>
+                </div>
+            </div>
+            
+            <div style="margin-top:30px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">En Çok Sorulan Sorular</h3>
+                <div id="top-questions" style="background:#f5f7fa;padding:15px;border-radius:8px;">
+                    <p style="color:#999;">Veri yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="performance-tab" class="content hidden">
+            <h2>🎯 Performans & Sistem Sağlığı</h2>
+            
+            <div class="stats-wrapper">
+                <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Ortalama Yanıt Süresi</h3>
+                    <div class="stat-value" id="avg-response-time">-</div>
+                    <small id="response-time-status">Hesaplanıyor...</small>
+                </div>
+                <div class="stat-card">
+                    <h3>Sistem Uptime</h3>
+                    <div class="stat-value" id="system-uptime">-</div>
+                    <small id="uptime-detail">Yüklüyor...</small>
+                </div>
+                <div class="stat-card">
+                    <h3>Bellek Kullanımı</h3>
+                    <div class="stat-value" id="memory-usage">-</div>
+                    <small id="memory-detail">Yüklüyor...</small>
+                </div>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-top:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">Son 24 Saat Aktivite</h3>
+                <div id="activity-chart" style="background:white;border-radius:8px;padding:20px;">
+                    <div style="text-align:center;color:#999;padding:40px;">Yüklüyor...</div>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-top:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">📊 Detaylı Metrikler</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">
+                    <div style="background:white;padding:15px;border-radius:8px;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Toplam İstek</div>
+                        <div style="font-size:24px;font-weight:bold;color:#667eea;" id="total-requests">0</div>
+                    </div>
+                    <div style="background:white;padding:15px;border-radius:8px;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Başarılı İstek</div>
+                        <div style="font-size:24px;font-weight:bold;color:#4CAF50;" id="success-requests">0</div>
+                    </div>
+                    <div style="background:white;padding:15px;border-radius:8px;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Hatalı İstek</div>
+                        <div style="font-size:24px;font-weight:bold;color:#f44336;" id="error-requests">0</div>
+                    </div>
+                    <div style="background:white;padding:15px;border-radius:8px;">
+                        <div style="font-size:12px;color:#666;margin-bottom:5px;">Başarı Oranı</div>
+                        <div style="font-size:24px;font-weight:bold;color:#FF9800;" id="success-rate">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="backup-tab" class="content hidden">
+            <h2>🔄 Yedekleme & Geri Yükleme</h2>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">Otomatik Yedekleme</h3>
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="auto-backup" checked style="width:auto;">
+                        <span>Otomatik yedeklemeyi aktif et</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Yedekleme Sıklığı:</label>
+                    <select style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;">
+                        <option>Her Gün</option>
+                        <option>Her Hafta</option>
+                        <option>Her Ay</option>
+                    </select>
+                </div>
+                <button class="btn">💾 Ayarları Kaydet</button>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">Manuel Yedekleme</h3>
+                <div class="form-actions">
+                    <button class="btn" onclick="backupAll()">📥 Tüm Verileri Yedekle</button>
+                    <button class="btn" onclick="exportQA()" style="background:#764ba2;">📥 Sadece Q&A Yedekle</button>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">Geri Yükleme</h3>
+                <input type="file" id="restore-file" accept=".json" style="display:none;" onchange="restoreBackup(event)">
+                <button class="btn" onclick="document.getElementById('restore-file').click()">📤 Yedeği Geri Yükle</button>
+                <p style="color:#999;margin-top:10px;font-size:14px;">⚠️ Dikkat: Mevcut veriler silinecek!</p>
+            </div>
+        </div>
+        
+        <div id="ai-learning-tab" class="content hidden">
+            <h2>🧠 Yapay Zeka Öğrenme & Eğitim Paneli</h2>
+            
+            <div class="stats-wrapper">
+                <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Eğitim Verisi</h3>
+                    <div class="stat-value" id="training-data-count">0</div>
+                    <small>Toplam konuşma</small>
+                </div>
+                <div class="stat-card">
+                    <h3>Öğrenilen Paternler</h3>
+                    <div class="stat-value" id="learned-patterns">0</div>
+                    <small>Yeni patern</small>
+                </div>
+                <div class="stat-card">
+                    <h3>Başarı Oranı</h3>
+                    <div class="stat-value" id="success-rate">0%</div>
+                    <small>Yanıt doğruluğu</small>
+                </div>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">🚀 Otomatik Eğitim</h3>
+                <div style="display:grid;grid-template-columns:1fr;gap:10px;">
+                    <button class="btn" onclick="analyzeConversations()">🔍 Tüm Konuşmaları Analiz Et</button>
+                    <button class="btn" onclick="generateQAFromChats()" style="background:#9C27B0;">✨ Otomatik Q&A Oluştur</button>
+                    <button class="btn" onclick="learnAndCleanMessages()" style="background:#F44336;font-size:16px;padding:15px;">🧹 ÖĞREN VE TEMİZLE</button>
+                </div>
+                <p style="color:#999;font-size:12px;margin-top:10px;">⚠️ "Öğren ve Temizle" butonu: AI tüm mesajları analiz edip öğrenir, sonra mesajları siler. Öğrenilen bilgiler kalır.</p>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">📊 Eğitim İstatistikleri</h3>
+                <div id="training-stats" style="background:white;padding:15px;border-radius:8px;">
+                    <div style="margin-bottom:15px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                            <span>💬 En Çok Sorulan Sorular</span>
+                            <span id="top-questions-count">0</span>
+                        </div>
+                        <div style="background:#e0e0e0;height:8px;border-radius:4px;overflow:hidden;">
+                            <div id="top-questions-bar" style="background:#667eea;height:100%;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                            <span>🤖 Bot Yanıt Oranı</span>
+                            <span id="bot-response-rate">0%</span>
+                        </div>
+                        <div style="background:#e0e0e0;height:8px;border-radius:4px;overflow:hidden;">
+                            <div id="bot-response-bar" style="background:#4CAF50;height:100%;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                            <span>🧠 AI Yanıt Oranı</span>
+                            <span id="ai-response-rate">0%</span>
+                        </div>
+                        <div style="background:#e0e0e0;height:8px;border-radius:4px;overflow:hidden;">
+                            <div id="ai-response-bar" style="background:#9C27B0;height:100%;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                            <span>👤 Admin Müdahale Oranı</span>
+                            <span id="admin-intervention-rate">0%</span>
+                        </div>
+                        <div style="background:#e0e0e0;height:8px;border-radius:4px;overflow:hidden;">
+                            <div id="admin-intervention-bar" style="background:#FF9800;height:100%;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">📈 Öğrenilen Yeni Paternler</h3>
+                <div id="learned-patterns-list" style="background:white;padding:15px;border-radius:8px;max-height:300px;overflow-y:auto;">
+                    <div style="text-align:center;color:#999;padding:20px;">Henüz patern analizi yapılmadı</div>
+                </div>
+            </div>
+            
+
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">🛠️ Eğitim Ayarları</h3>
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="auto-learning" checked style="width:auto;">
+                        <span>Otomatik öğrenmeyi aktif et</span>
+                    </label>
+                    <small style="color:#666;display:block;margin-top:5px;">Her yeni konuşmadan otomatik öğren</small>
+                </div>
+                <div class="form-group">
+                    <label>Minimum Güven Skoru (Q&A oluşturma için):</label>
+                    <input type="range" id="confidence-threshold" min="0.5" max="1" step="0.05" value="0.8" style="width:100%;">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;">
+                        <span>Düşük (0.5)</span>
+                        <span id="confidence-value">0.8</span>
+                        <span>Yüksek (1.0)</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Eğitim Sıklığı:</label>
+                    <select id="training-frequency" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;">
+                        <option value="realtime">Gerçek Zamanlı</option>
+                        <option value="hourly">Saatlik</option>
+                        <option value="daily" selected>Günlük</option>
+                        <option value="weekly">Haftalık</option>
+                        <option value="manual">Manuel</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="saveAISettings()">💾 Ayarları Kaydet</button>
+            </div>
+        </div>
+        
+        <div id="test-tab" class="content hidden">
+            <h2>🧪 Sistem Test Paneli</h2>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">🚀 Hızlı Test</h3>
+                <button class="btn" onclick="runAllTests()" style="width:100%;font-size:18px;padding:20px;">⚡ TÜM TESTLERİ ÇALIŞTIR</button>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">🔍 Bireysel Testler</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;">
+                    <button class="btn" onclick="testAPI()" style="background:#4CAF50;padding:12px;font-size:13px;">🎯 API</button>
+                    <button class="btn" onclick="testDatabase()" style="background:#2196F3;padding:12px;font-size:13px;">💾 DB</button>
+                    <button class="btn" onclick="testDBMigration()" style="background:#3F51B5;padding:12px;font-size:13px;">🔄 DB Migration</button>
+                    <button class="btn" onclick="testSocket()" style="background:#FF9800;padding:12px;font-size:13px;">🔌 Socket</button>
+                    <button class="btn" onclick="testQA()" style="background:#9C27B0;padding:12px;font-size:13px;">📚 Q&A</button>
+                    <button class="btn" onclick="testChat()" style="background:#00BCD4;padding:12px;font-size:13px;">💬 Chat</button>
+                    <button class="btn" onclick="testAdmin()" style="background:#E91E63;padding:12px;font-size:13px;">👤 Admin</button>
+                    <button class="btn" onclick="testAILearning()" style="background:#673AB7;padding:12px;font-size:13px;">🧠 AI Öğrenme</button>
+                    <button class="btn" onclick="testSecurity()" style="background:#F44336;padding:12px;font-size:13px;">🔒 Güvenlik</button>
+                    <button class="btn" onclick="testPerformance()" style="background:#009688;padding:12px;font-size:13px;">⚡ Performans</button>
+                    <button class="btn" onclick="testOpenAI()" style="background:#10A37F;padding:12px;font-size:13px;">🤖 OpenAI</button>
+                    <button class="btn" onclick="testAIModes()" style="background:#7C3AED;padding:12px;font-size:13px;">🎭 AI Modes</button>
+                    <button class="btn" onclick="testAIDestek()" style="background:#2196F3;padding:12px;font-size:13px;">💬 AI-DESTEK</button>
+                    <button class="btn" onclick="testAISatis()" style="background:#4CAF50;padding:12px;font-size:13px;">💰 AI-SATIŞ</button>
+                    <button class="btn" onclick="testAIRouter()" style="background:#FF5722;padding:12px;font-size:13px;">🧭 AI Router</button>
+                    <button class="btn" onclick="testFileSystem()" style="background:#795548;padding:12px;font-size:13px;">📁 File System</button>
+                    <button class="btn" onclick="testTelegram()" style="background:#0088cc;padding:12px;font-size:13px;">📨 Telegram</button>
+                    <button class="btn" onclick="testEnv()" style="background:#607D8B;padding:12px;font-size:13px;">🔐 ENV</button>
+                    <button class="btn" onclick="testAPIKeys()" style="background:#F44336;padding:12px;font-size:13px;">🔑 API Keys</button>
+                    <button class="btn" onclick="testBackup()" style="background:#009688;padding:12px;font-size:13px;">💾 Backup</button>
+                    <button class="btn" onclick="testSettings()" style="background:#9E9E9E;padding:12px;font-size:13px;">⚙️ Settings</button>
+                    <button class="btn" onclick="testCostTracking()" style="background:#4CAF50;padding:12px;font-size:13px;">💰 Maliyet</button>
+                    <button class="btn" onclick="testCostOptimization()" style="background:#FF9800;padding:12px;font-size:13px;">📊 Optimizasyon</button>
+                    <button class="btn" onclick="testIndexPage()" style="background:#00BCD4;padding:12px;font-size:13px;">🏠 Index</button>
+                    <button class="btn" onclick="testChatbotHealth()" style="background:#8BC34A;padding:12px;font-size:13px;">🤖 Chatbot</button>
+                    <button class="btn" onclick="testWidgetLoad()" style="background:#FFC107;padding:12px;font-size:13px;">💬 Widget</button>
+                    <button class="btn" onclick="testMessageFlow()" style="background:#03A9F4;padding:12px;font-size:13px;">📨 Mesaj</button>
+                </div>
+            </div>
+            
+
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">🏥 Sağlık Kontrolleri</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+                    <button class="btn" onclick="testIndexHealth()" style="background:#00BCD4;padding:10px;font-size:13px;">🏠 Index</button>
+                    <button class="btn" onclick="testChatbotSystem()" style="background:#8BC34A;padding:10px;font-size:13px;">🤖 Chatbot</button>
+                    <button class="btn" onclick="testAISystem()" style="background:#9C27B0;padding:10px;font-size:13px;">🧠 AI</button>
+                    <button class="btn" onclick="testAdminPanel()" style="background:#E91E63;padding:10px;font-size:13px;">👨💼 Admin</button>
+                </div>
+            </div>
+
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;">
+                <h3 style="color:#667eea;margin-bottom:15px;">📊 Test Sonuçları</h3>
+                <div id="test-results" style="background:white;padding:15px;border-radius:8px;min-height:300px;max-height:500px;overflow-y:auto;font-family:monospace;font-size:13px;">
+                    <div style="color:#999;text-align:center;padding:40px;">Test sonuçları burada görüntülenecek...</div>
+                </div>
+                <button class="btn" onclick="clearTestResults()" style="background:#999;margin-top:10px;">🗑️ Sonuçları Temizle</button>
+            </div>
+        </div>
+        
+
+
+        <div id="settings-tab" class="content hidden">
+            <h2>Bot Ayarları</h2>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">🤖 Sistem Ayarları</h3>
+                
+                <div class="form-group">
+                    <label>Sistem Durumu:</label>
+                    <select id="bot-status" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;">
+                        <option value="active">✅ Aktif</option>
+                        <option value="inactive">❌ Pasif</option>
+                        <option value="maintenance">🔧 Bakımda</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Bot Dili:</label>
+                    <select id="bot-language" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;">
+                        <option value="tr">🇹🇷 Türkçe</option>
+                        <option value="en">🇬🇧 English</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;border-left:4px solid #667eea;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">🤖 AI Asistan Ayarları</h3>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="ai-enabled" checked style="width:auto;">
+                        <span>AI Asistanı Aktif Et</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Bot Adı:</label>
+                    <input type="text" id="ai-name" placeholder="Hay Day Asistan" value="Hay Day Asistan">
+                </div>
+                
+                <div class="form-group">
+                    <label>Karşılama Mesajı:</label>
+                    <textarea id="ai-welcome" rows="2" placeholder="Merhaba! Size nasıl yardımcı olabilirim?">Merhaba! 🌾 Hay Day malzeme satışı için buradayım. Size nasıl yardımcı olabilirim?</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Varsayılan Yanıt:</label>
+                    <textarea id="ai-default" rows="2" placeholder="Üzgünüm, bu konuda yardımcı olamadım.">Üzgünüm, bu konuda size yardımcı olamıyorum. Fiyat listesi, ürünler veya teslimat hakkında soru sorabilirsiniz.</textarea>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">💬 Sistem Mesajları</h3>
+                
+                <div class="form-group">
+                    <label>Çevrimdışı Mesajı:</label>
+                    <textarea id="offline-message" rows="2" placeholder="Şu anda çevrimdışıyız. Lütfen daha sonra tekrar deneyin.">Şu anda çevrimdışıyız. Lütfen daha sonra tekrar deneyin.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Bakım Mesajı:</label>
+                    <textarea id="maintenance-message" rows="2" placeholder="Bot bakımdadır. Kısa süre sonra tekrar deneyin.">Sistem bakımdadır. Kısa süre sonra tekrar deneyin. 🔧</textarea>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">⏱️ Yanıt Süreleri</h3>
+                
+                <div class="form-group">
+                    <label>Yazma Animasyonu Süresi (saniye):</label>
+                    <input type="number" id="typing-delay" min="0" max="5" step="0.5" value="1.5" placeholder="1.5">
+                    <small style="color:#999;">Bot yanıt vermeden önce "yazıyor..." gösterme süresi</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Otomatik Yanıt Gecikme (saniye):</label>
+                    <input type="number" id="response-delay" min="0" max="10" step="0.5" value="0.5" placeholder="0.5">
+                    <small style="color:#999;">Mesaj alındıktan sonra yanıt verme süresi</small>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">🔒 Güvenlik Ayarları</h3>
+                
+                <div class="form-group">
+                    <label>Maksimum Mesaj Uzunluğu (karakter):</label>
+                    <input type="number" id="max-message-length" min="100" max="5000" value="800" placeholder="800">
+                </div>
+                
+                <div class="form-group">
+                    <label>Spam Koruması (saniye başına mesaj):</label>
+                    <input type="number" id="spam-limit" min="1" max="10" value="3" placeholder="3">
+                    <small style="color:#999;">Kullanıcının saniyede gönderebileceği maksimum mesaj sayısı</small>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="block-links" style="width:auto;">
+                        <span>Link gönderimini engelle</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="profanity-filter" style="width:auto;">
+                        <span>Küfür filtresini aktif et</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">🎨 Görünüm Ayarları</h3>
+                
+                <div class="form-group">
+                    <label>Widget Pozisyonu:</label>
+                    <select id="widget-position" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;">
+                        <option value="bottom-right">Sağ Alt</option>
+                        <option value="bottom-left">Sol Alt</option>
+                        <option value="top-right">Sağ Üst</option>
+                        <option value="top-left">Sol Üst</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Widget Renk Teması:</label>
+                    <select id="widget-theme" style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;">
+                        <option value="green">💚 Yeşil (Varsayılan)</option>
+                        <option value="blue">💙 Mavi</option>
+                        <option value="purple">💜 Mor</option>
+                        <option value="red">❤️ Kırmızı</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="show-avatar" checked style="width:auto;">
+                        <span>Bot avatarını göster</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="show-timestamp" checked style="width:auto;">
+                        <span>Mesaj zaman damgasını göster</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="sound-enabled" checked style="width:auto;">
+                        <span>Bildirim sesini aktif et</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">📊 Analitik Ayarları</h3>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="track-users" checked style="width:auto;">
+                        <span>Kullanıcı takibini aktif et</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="save-history" checked style="width:auto;">
+                        <span>Sohbet geçmişini kaydet</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Geçmiş Saklama Süresi (gün):</label>
+                    <input type="number" id="history-retention" min="1" max="365" value="30" placeholder="30">
+                    <small style="color:#999;">Sohbet geçmişinin kaç gün saklanacağı</small>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;border-left:4px solid #F44336;">
+                <h3 style="color:#F44336;margin-bottom:15px;font-size:16px;">🔐 API Keys & Tokens</h3>
+                
+                <div class="form-group">
+                    <label>OpenAI API Key:</label>
+                    <div style="display:flex;gap:10px;">
+                        <input type="password" id="openai-api-key" placeholder="sk-proj-..." style="flex:1;">
+                        <button class="btn" onclick="toggleKeyVisibility('openai-api-key')" style="width:auto;padding:8px 15px;">👁️</button>
+                    </div>
+                    <small style="color:#666;display:block;margin-top:5px;">OpenAI GPT-3.5/4 için gerekli</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Telegram Bot Token:</label>
+                    <div style="display:flex;gap:10px;">
+                        <input type="password" id="telegram-bot-token" placeholder="1234567890:ABC..." style="flex:1;">
+                        <button class="btn" onclick="toggleKeyVisibility('telegram-bot-token')" style="width:auto;padding:8px 15px;">👁️</button>
+                    </div>
+                    <small style="color:#666;display:block;margin-top:5px;">Telegram bildirimleri için</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Admin Telegram ID:</label>
+                    <input type="text" id="admin-telegram-id" placeholder="123456789">
+                    <small style="color:#666;display:block;margin-top:5px;">Telegram kullanıcı ID'niz</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn" onclick="saveAPIKeys()" style="background:#F44336;">🔐 API Keys Kaydet</button>
+                    <button class="btn" onclick="testAPIKeysSettings()" style="background:#2196F3;">🧪 Test Et</button>
+                </div>
+                
+                <div style="background:#fff3cd;padding:10px;border-radius:4px;margin-top:15px;border-left:4px solid #ffc107;">
+                    <strong>⚠️ GÜVENLİK UYARISI:</strong>
+                    <p style="margin:5px 0 0 0;font-size:12px;color:#856404;">
+API keyler .env dosyasında saklanır. Sunucuyu yeniden başlatmanız gerekir.</p>
+                </div>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">🔔 Bildirim Ayarları</h3>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="telegram-notifications" checked style="width:auto;">
+                        <span>Telegram bildirimlerini aktif et</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="email-notifications" style="width:auto;">
+                        <span>E-posta bildirimlerini aktif et</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>Bildirim E-posta Adresi:</label>
+                    <input type="email" id="notification-email" placeholder="admin@example.com">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn" onclick="saveSettings()">💾 Tüm Ayarları Kaydet</button>
+                <button class="btn" onclick="resetSettings()" style="background:#999;">🔄 Varsayılana Sıfırla</button>
+                <button class="btn" onclick="exportSettings()" style="background:#764ba2;">📥 Ayarları Dışa Aktar</button>
+            </div>
+            
+            <div style="background:#f5f7fa;padding:15px;border-radius:8px;margin-top:20px;">
+                <h3 style="color:#667eea;margin-bottom:15px;font-size:16px;">🤖 AI Sistem Prompt</h3>
+                
+                <div class="form-group">
+                    <label>AI Sistem Prompt:</label>
+                    <textarea id="ai-system-prompt" rows="10" placeholder="AI için sistem prompt'u girin...">Sen Hay Day oyunu için profesyonel bir destek ve satış asistanısın.
+
+Görevin:
+- Ürün fiyatları ve özellikleri hakkında bilgi vermek
+- Satın alma kararlarında yardımcı olmak
+- Teslimat ve ödeme konularında destek sağlamak
+- Samimi ve yardımsever bir dille iletişim kurmak
+
+Kurallar:
+- Türkçe yanıt ver
+- Kısa ve net ol (max 5 cümle)
+- Emoji kullan: 🌾 💰 🚀 👍 ⚡
+- Sayılarla konuş</textarea>
+                    <small style="color:#666;display:block;margin-top:5px;">Bu prompt tüm AI yanıtlarında kullanılır</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn" onclick="saveAIPrompt()">💾 Prompt Kaydet</button>
+                    <button class="btn" onclick="resetAIPrompt()" style="background:#999;">🔄 Varsayılana Döndür</button>
+                    <button class="btn" onclick="testAIPrompt()" style="background:#2196F3;">🧪 Test Et</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="admin.js"></script>
+    <script src="message-style-fix.js"></script>
+    <script>
+        // Arama fonksiyonu
+        document.getElementById('qa-search')?.addEventListener('input', (e) => {
+            const search = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.qa-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(search) ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

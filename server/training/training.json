@@ -1,0 +1,78 @@
+{
+  "fewshot": [
+    {
+      "type": "fewshot",
+      "question": "Buğday fiyatı ne kadar?",
+      "answer": "Buğday fiyatı 100 TL'dir. 🌾 Hemen sipariş verebilirsiniz!",
+      "success_rate": 0.95,
+      "frequency": 8
+    },
+    {
+      "type": "fewshot",
+      "question": "Teslimat ne kadar sürer?",
+      "answer": "Teslimat süresi 24 saat içindedir. 📦 Hızlı teslimat için 12 saat seçeneği de var!",
+      "success_rate": 0.92,
+      "frequency": 6
+    },
+    {
+      "type": "fewshot",
+      "question": "Nasıl ödeme yapabilirim?",
+      "answer": "Kredi kartı, havale, Papara ve İninal ile ödeme yapabilirsiniz. 💳 Güvenli ödeme garantisi!",
+      "success_rate": 0.90,
+      "frequency": 5
+    },
+    {
+      "type": "fewshot",
+      "question": "Merhaba",
+      "answer": "Merhaba! 🌾 Hay Day malzeme satışı için buradayım. Size nasıl yardımcı olabilirim?",
+      "success_rate": 0.98,
+      "frequency": 15
+    },
+    {
+      "type": "fewshot",
+      "question": "Fiyat listesi",
+      "answer": "Fiyat listesi: Buğday 100 TL, Mısır 150 TL, Havuç 200 TL. Daha fazla bilgi için sorun!",
+      "success_rate": 0.94,
+      "frequency": 12
+    }
+  ],
+  "patterns": [
+    {
+      "type": "pattern",
+      "name": "greeting",
+      "examples": ["merhaba", "selam", "hey", "günaydın"],
+      "frequency": 30,
+      "category": "genel"
+    },
+    {
+      "type": "pattern",
+      "name": "price_inquiry",
+      "examples": ["fiyat", "ne kadar", "ücret", "para"],
+      "frequency": 25,
+      "category": "fiyat",
+      "template": "[Ürün] fiyatı [Fiyat] TL'dir. 🌾"
+    },
+    {
+      "type": "pattern",
+      "name": "delivery_inquiry",
+      "examples": ["teslimat", "kargo", "ne zaman", "gelir"],
+      "frequency": 20,
+      "category": "teslimat",
+      "template": "Teslimat süresi 24 saat içindedir. 📦"
+    },
+    {
+      "type": "pattern",
+      "name": "payment_inquiry",
+      "examples": ["ödeme", "nasıl öderim", "ödeme yöntemi"],
+      "frequency": 15,
+      "category": "odeme"
+    }
+  ],
+  "metadata": {
+    "version": "2.0",
+    "lastUpdated": "2024-01-01T00:00:00.000Z",
+    "totalFewshots": 5,
+    "totalPatterns": 4,
+    "source": "merged_training_data"
+  }
+}
