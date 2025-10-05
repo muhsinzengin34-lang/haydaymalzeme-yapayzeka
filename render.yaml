@@ -3,7 +3,7 @@ services:
     name: haydaydestek
     runtime: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install --production=false
     startCommand: npm start
     envVars:
       - key: NODE_ENV
