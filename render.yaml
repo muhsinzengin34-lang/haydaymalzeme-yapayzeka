@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: haydaydestek
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: PORT
+        value: 3000
+      - key: SALES_SHOPIER_URL
+        value: https://www.shopier.com/haydaymalzemeleri
+      - key: SALES_WHATSAPP
+        value: +905423246261
