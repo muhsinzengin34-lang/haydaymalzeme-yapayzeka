@@ -1,11 +1,69 @@
 {
-  "fewshot": [],
-  "patterns": [],
+  "fewshot": [
+    {
+      "type": "fewshot",
+      "question": "Arkadaş etiketi nedir ve nasıl bulunur?",
+      "answer": "🏷️ ARKADAŞ ETİKETİ NEDİR?\n\nArkadaş etiketi, oyun hesabınıza özel, #1A3B5C7D9 gibi görünen benzersiz bir sayısal ve harfsel kimliktir.\n\n✅ Kullanıcı adınız DEĞİLDİR.\n✅ Şifreniz veya özel bilgileriniz DEĞİLDİR.\n✅ Sadece sizi bulmak için kullanılır - tamamen GÜVENLİDİR! 🔒\n\n🎯 NEDEN ÖNEMLİ?\nBu etiketi paylaştığınızda, arkadaşlarınız sizi anında bulup ekleyebilir; karışıklık yaşanmaz!\n\n📲 NASIL BULUNUR?\n\n1️⃣ Oyunu Aç & Arkadaşlar Menüsüne Git:\nOyunu başlatın ve ana ekrandaki \"Arkadaşlar\" sekmesine (genellikle alt kısımda) dokun.\n\n2️⃣ Arkadaş Listesini Aç:\nAçılan pencerede, iki kişi silüeti veya bir kitap şeklinde olan \"Arkadaş Listesi\" simgesine dokun.\n\n3️⃣ \"Arkadaşlık İstekleri\"ne Tıkla:\nArkadaş menüsünün üst kısmında \"İstekler\" veya \"Arkadaş Ekle\" gibi bir sekme bulun. Ona dokunun.\n\n4️⃣ Etiketini Gör!:\nİşte orada! \"#987654321\" gibi bir rakam dizisi görünecek. Bu, sizin arkadaş etiketiniz.\n\n📋 NASIL KOPYALANIR?\n\nEtiketin yanında genellikle iki küçük kare veya \"Kopyala\" yazan bir düğme bulunur. Bu simgeye bir kez dokunduğunuzda, etiketiniz panonuza kopyalanır. Artık yapıştırıp (paste) istediğiniz kişiyle paylaşabilirsiniz!\n\n🎉 ÖZET:\nArtık arkadaş listenizi doldurmak çok daha kolay! Etiketinizi kopyalayın, paylaşın ve oyun keyfini birlikte çıkarın!",
+      "success_rate": 0.95,
+      "frequency": 15
+    },
+    {
+      "type": "fewshot",
+      "question": "Günlük kota nedir ve nasıl kontrol edilir?",
+      "answer": "📊 GÜNLÜK KOTA BİLGİSİ\n\n🔢 Günlük Kota Limitiniz: 80 birim\n\nBu, aşağıda listelenen belirli ürünleri gün içinde toplayabileceğiniz maksimum miktardır. Limit, her gün belirli bir saatte (Sıfırlanma Zamanı) otomatik olarak sıfırlanır.\n\n✅ KOTAYA DAHİL ÜRÜNLER:\n🏠 Ağıl Büyütme Ürünleri\n🗃️ Ambar Büyütme Ürünleri\n🌾 Arazi Açma Ürünleri\n🏗️ Kasaba Bina Yükseltme Ürünleri\n\n📲 KOTA NASIL GÖRÜNTÜLENIR?\n\n1️⃣ Ana ekranda sol üstteki \"Seviye\" alanına dokun.\n2️⃣ Açılan pencereden ortadaki seçeneği tıkla veya seç.\n3️⃣ Sayfada aşağı kaydır ve \"Günlük Alım Limiti\" ile \"Sıfırlanma Zamanı\" bilgilerini gör.\n\n💡 NEDEN ÖNEMLİ?\n\n✅ Planlama: Günlük 80 birimlik limitinizi hangi ürünlere harcayacağınızı öncelik sırasına koyarak plan yapın.\n\n✅ Verimlilik: Eğer kotanız dolmuşsa, yukarıdaki ürünleri toplayamazsınız. Bu nedenle, oyun içi etkinliklere katılmadan veya görevleri tamamlamadan önce kotanızı kontrol edin.\n\n⚠️ UNUTMAYIN: Kota sadece bu listedeki 'büyütme' ve 'açma' ürünlerini kapsar. Temel üretim kaynaklarınız (buğday, altın, taş vb.) genellikle bu limitten etkilenmez.\n\n🚀 ÖZET: Artık kotanızı neyin doldurduğunu biliyorsunuz! Akıllıca planlayın, önceliklendirin ve kaynaklarınızı en verimli şekilde kullanarak kasabanızı daha hızlı büyütün!",
+      "success_rate": 0.92,
+      "frequency": 12
+    },
+    {
+      "type": "fewshot",
+      "question": "Ürün teslimatı nasıl yapılır?",
+      "answer": "📦 TESLİMAT SÜRECİ\n\n🎯 HAZIRLIK:\n✅ Oyun içinde arkadaş ekleme kodunuzu paylaşın.\n✅ Kodu aldıktan sonra sizi güvenli transfer için belirlediğimiz oyuna ekleriz.\n\n📋 TESLİMAT ADIMLARI:\n\n1️⃣ Eklediğimiz arkadaş isteğini kabul edin ve oyuna giriş yapın.\n\n2️⃣ Sipariş ettiğiniz ürünleri tezgâhımıza dizeriz.\n\n3️⃣ Siz, tezgâhımızdan ürünleri tek tek toplayın.\n\n4️⃣ Tüm ürünler tamamlandığında WhatsApp'tan \"teslim aldım\" diye onay verin.\n\n5️⃣ Günlük limit nedeniyle eksik kalan olursa kalan ürünleri başka bir oyun etiketi verip alın.\n\n⚠️ ÖNEMLİ NOTLAR:\n\n📊 Oyunda günlük kota olduğu için teslimatları dikkat edin; lütfen limitinizi takip edin.\n\n⏰ Müsait saat aralığınızı önceden yazmanız işlemi hızlandırır.\n\n🔧 Bağlantı sorunu/yanlış ürün görürseniz hemen yazın; anında düzeltiriz.",
+      "success_rate": 0.90,
+      "frequency": 20
+    },
+    {
+      "type": "fewshot",
+      "question": "Altın transferi nasıl yapılır?",
+      "answer": "💰 ALTIN TRANSFERİ NASIL YAPILIR?\n\n✅ ÖN ŞARTLAR:\n🎮 Oyun seviyeniz 40 ve üstü olmalı.\n📦 Ağıl/depo içinde en az 200 boş yer açın ve haber verin.\n\n📋 TRANSFER ADIMLARI:\n\n1️⃣ Ben, seviyenize uygun ürünleri tezgaha 1 altından koyarım.\n\n2️⃣ Siz bu ürünleri teker teker satın alırsınız.\n\n3️⃣ Aynı ürünleri kendi tezgahınıza en yüksek birim fiyattan tekrar koyarsınız.\n\n4️⃣ Ben bu ürünleri sizden satın alırım.\n\n5️⃣ İstediğiniz altın tutarına ulaşana kadar 3–4. adımları tekrarlarız.\n\n6️⃣ Hedefe ulaştığımızda işlem tamamlanır.\n\n💡 KISA ÖZET:\nÜrünler düşük fiyattan sizde toplanır, yüksek fiyattan sizden geri alınır; \nara daki fark altın olarak size döner.\n\n⚠️ ÖNEMLİ NOTLAR:\n📊 Transfer süresi, altın miktarına göre değişir.\n🔄 İşlem boyunca oyunda aktif olmanız gerekir.\n💬 Her adımda iletişim halinde olacağız.",
+      "success_rate": 0.88,
+      "frequency": 10
+    }
+  ],
+  "patterns": [
+    {
+      "type": "pattern",
+      "name": "fiyat_sorgu",
+      "examples": ["fiyat", "kaç para", "ne kadar", "liste", "ücret", "tarife"],
+      "frequency": 35,
+      "category": "fiyat"
+    },
+    {
+      "type": "pattern",
+      "name": "teslimat_sorgu",
+      "examples": ["teslimat", "teslim", "süre", "ne zaman", "kaç dakika"],
+      "frequency": 30,
+      "category": "teslimat"
+    },
+    {
+      "type": "pattern",
+      "name": "odeme_sorgu",
+      "examples": ["ödeme", "nasıl öderim", "kart", "iban", "shopier"],
+      "frequency": 25,
+      "category": "odeme"
+    },
+    {
+      "type": "pattern",
+      "name": "teknik_sorgu",
+      "examples": ["etiket", "kota", "transfer", "nasıl yapılır", "arkadaş kodu"],
+      "frequency": 20,
+      "category": "teknik"
+    }
+  ],
   "metadata": {
     "version": "2.0",
     "lastUpdated": "2025-01-05T00:00:00.000Z",
-    "totalFewshots": 0,
-    "totalPatterns": 0,
-    "source": "empty_initial"
+    "totalFewshots": 4,
+    "totalPatterns": 4,
+    "source": "veri_txt_import"
   }
 }
